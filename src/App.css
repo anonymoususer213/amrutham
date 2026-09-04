@@ -1,1 +1,35 @@
-/* Blank */
+.app-container {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.backdrop-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55vw;
+  max-width: 900px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.backdrop-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 95vh;
+  object-fit: contain;
+  object-position: top right;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .backdrop-container {
+    width: 80vw;
+    opacity: 0.6;
+  }
+}

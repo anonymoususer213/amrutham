@@ -1,4 +1,6 @@
 .site-header {
+  position: relative;
+  z-index: 10;
   width: 100%;
   padding: 36px clamp(40px, 10vw, 140px);
   background-color: transparent;
