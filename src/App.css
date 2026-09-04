@@ -2,34 +2,34 @@
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  background-color: #F2E3D2;
 }
 
 .backdrop-container {
   position: absolute;
-  top: 20px;
-  right: -4vw;
-  width: 95vw;
-  max-width: 1850px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
   z-index: 1;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
+  overflow: hidden;
 }
 
 .backdrop-image {
   width: 100%;
-  height: auto;
-  object-fit: contain;
-  object-position: top right;
+  height: 100%;
+  object-fit: cover;
+  object-position: right top;
   user-select: none;
+  display: block;
 }
 
 @media (max-width: 768px) {
-  .backdrop-container {
-    top: 10px;
-    right: -8vw;
-    width: 115vw;
-    opacity: 0.55;
+  .backdrop-image {
+    object-position: 70% top;
+    opacity: 0.85;
   }
 }
