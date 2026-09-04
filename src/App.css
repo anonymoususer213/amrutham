@@ -7,9 +7,9 @@
 .backdrop-container {
   position: absolute;
   top: 90px;
-  right: 5vw;
-  width: 65vw;
-  max-width: 1150px;
+  right: 15vw;
+  width: 72vw;
+  max-width: 1300px;
   pointer-events: none;
   z-index: 1;
   display: flex;
