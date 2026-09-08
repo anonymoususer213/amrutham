@@ -1,0 +1,520 @@
+/* Footer.css — Premium Amrutham Footer — Fixed */
+
+/* ══════════════════════════════════════════
+   ROOT: Prevent body background bleeding below footer.
+   The body bg (#F2E3D2) must not appear below the footer's
+   dark bottom bar (#091623). We set the html/body to inherit
+   the footer's end colour at the very bottom.
+   This is handled by setting the app-container to flex-column
+   and the footer being the last child. The fix is ensuring
+   the site-footer itself has no margin/border/gap artifacts.
+══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   1. WRAPPER — no leaking background
+══════════════════════════════════════════ */
+
+.site-footer {
+  width: 100%;
+  /* No position:relative here — avoids stacking context issues */
+  overflow-x: hidden;
+  /* Kill any inherited margin/border that could create a gap */
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  /* Ensure footer fills horizontally to the exact viewport edge */
+  box-sizing: border-box;
+}
+
+/* ══════════════════════════════════════════
+   2. SPICE GARDEN BOTANICAL DECORATIVE BORDER
+   Uses the spice border graphic featuring herbs, spices & seeds
+   seamlessly transitioning into the footer.
+══════════════════════════════════════════ */
+
+.footer-spices-border {
+  width: 100%;
+  background-color: #FEF7E9;
+  display: block;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  overflow: hidden;
+}
+
+.footer-spices-pattern {
+  width: 100%;
+  height: clamp(75px, 9.5vw, 130px);
+  background-image: url('/assets/footer-spices-border.png');
+  background-repeat: repeat-x;
+  background-position: bottom center;
+  background-size: auto 100%;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* ══════════════════════════════════════════
+   3. FOOTER BODY (Navy)
+   Directly after .botanical-scallop — no gap.
+══════════════════════════════════════════ */
+
+.footer-body {
+  background-color: #0c1d2e;
+  width: 100%;
+  padding: clamp(48px, 6vw, 80px) clamp(24px, 6vw, 80px) clamp(36px, 5vw, 60px);
+  box-sizing: border-box;
+  /* Kill any block-level gap at the top of this element */
+  margin: 0;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  /* Desktop: brand ~28%, links ~16%, contact ~28%, location ~28% */
+  grid-template-columns: 1.7fr 1fr 1.5fr 1.5fr;
+  column-gap: clamp(28px, 4vw, 60px);
+  row-gap: 0;
+  align-items: start;
+}
+
+/* ══════════════════════════════════════════
+   4. COLUMN SHARED STYLES
+══════════════════════════════════════════ */
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Orange section headings — consistent across all columns */
+.footer-col-heading {
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  color: #c8521d;
+  /* Fixed bottom margin keeps all heading→content spacing equal */
+  margin: 0 0 18px 0;
+  padding: 0;
+  line-height: 1;
+}
+
+/* ══════════════════════════════════════════
+   5. BRAND / LOGO COLUMN
+══════════════════════════════════════════ */
+
+.footer-logo-link {
+  display: inline-block;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+  /* Space between logo and tagline */
+  margin-bottom: 14px;
+  /* Prevent link from stretching full column width */
+  align-self: flex-start;
+}
+
+.footer-logo-link:hover {
+  opacity: 0.8;
+}
+
+.footer-logo {
+  /* Natural height — no filter, no inversion, no colour manipulation.
+     The logo PNG is displayed as-is so original colours are preserved. */
+  height: clamp(52px, 6.5vw, 76px);
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  display: block;
+  /* No filter — the white-box bug was caused by brightness(0) invert(1) */
+}
+
+.footer-brand-tagline {
+  font-family: 'DM Serif Display', 'Fraunces', Georgia, serif;
+  font-size: clamp(13px, 1vw, 15px);
+  line-height: 1.5;
+  color: rgba(254, 247, 233, 0.48);
+  margin: 0;
+  font-style: italic;
+}
+
+/* ══════════════════════════════════════════
+   6. QUICK LINKS COLUMN
+══════════════════════════════════════════ */
+
+.footer-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.footer-nav-link {
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(254, 247, 233, 0.72);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+
+.footer-nav-link:hover {
+  color: #c8521d;
+  transform: translateX(3px);
+}
+
+/* ══════════════════════════════════════════
+   7. CONTACT COLUMN
+══════════════════════════════════════════ */
+
+.footer-info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.footer-info-item {
+  display: flex;
+  align-items: center; /* vertically center icon with single-line text */
+  gap: 9px;
+}
+
+.footer-info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #c8521d;
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+}
+
+.footer-contact-link {
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(254, 247, 233, 0.7);
+  text-decoration: none;
+  line-height: 1.45;
+  transition: color 0.2s ease;
+  /* Allow long email to wrap on narrow columns, no overflow */
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.footer-contact-link:hover {
+  color: #c8521d;
+}
+
+/* ══════════════════════════════════════════
+   8. LOCATION COLUMN
+   Fix: icon placed ABOVE the address block using flex column,
+   not inline-flex row (which caused the icon to float left of
+   all the address lines creating misalignment).
+══════════════════════════════════════════ */
+
+.footer-address-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.footer-address-wrapper .footer-info-icon {
+  /* Align icon with the first line of the address */
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.footer-address {
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13.5px;
+  font-weight: 400;
+  font-style: normal;
+  color: rgba(254, 247, 233, 0.65);
+  line-height: 1.75;
+  margin: 0;
+  padding: 0;
+}
+
+/* ══════════════════════════════════════════
+   9. SEPARATOR — thin 1px line between body and bottom bar
+══════════════════════════════════════════ */
+
+.footer-separator {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(254, 247, 233, 0.08);
+  /* Push the separator below the columns and give it breathing room */
+  margin: clamp(36px, 4vw, 52px) 0 0 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  display: block;
+  box-sizing: border-box;
+}
+
+/* ══════════════════════════════════════════
+   10. FOOTER BOTTOM BAR
+   Fix: no extra border, shadow, or outline.
+   Background must be solid #091623 right to the viewport edge.
+   The page body bg (#F2E3D2) must not leak below it —
+   achieved by the app-container flex column fill and the
+   html/body override in index.css (see note in App.css).
+══════════════════════════════════════════ */
+
+.footer-bottom {
+  background-color: #091623;
+  width: 100%;
+  /* Generous padding keeps content away from viewport edges */
+  padding: 18px clamp(24px, 6vw, 80px);
+  box-sizing: border-box;
+  margin: 0;
+  /* No border, no shadow, no outline — clean bottom edge */
+  border: none;
+  outline: none;
+}
+
+.footer-bottom-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  /* Do not flex-wrap on desktop — keeps three groups on one line */
+  flex-wrap: nowrap;
+}
+
+.footer-copyright {
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(254, 247, 233, 0.38);
+  margin: 0;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/* Social Icons */
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Center group in the middle third */
+  flex-shrink: 0;
+}
+
+.footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(254, 247, 233, 0.07);
+  color: rgba(254, 247, 233, 0.5);
+  text-decoration: none;
+  border: 1px solid rgba(254, 247, 233, 0.1);
+  transition: background-color 0.22s ease, color 0.22s ease, transform 0.22s ease;
+  flex-shrink: 0;
+}
+
+.footer-social-link:hover {
+  background-color: #c8521d;
+  color: #ffffff;
+  border-color: #c8521d;
+  transform: translateY(-2px);
+}
+
+/* Legal Links */
+.footer-legal-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.footer-legal-link {
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(254, 247, 233, 0.38);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.footer-legal-link:hover {
+  color: #c8521d;
+}
+
+.footer-legal-sep {
+  color: rgba(254, 247, 233, 0.2);
+  font-size: 12px;
+  user-select: none;
+  line-height: 1;
+}
+
+/* ══════════════════════════════════════════
+   11. TABLET  ≤ 960px
+   2×2 grid — brand full-width top row,
+   then links + contact, then location alone.
+══════════════════════════════════════════ */
+
+@media (max-width: 960px) {
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    column-gap: clamp(24px, 4vw, 48px);
+    row-gap: clamp(36px, 4vw, 48px);
+  }
+
+  /* Brand spans both columns */
+  .footer-col-brand {
+    grid-column: 1 / -1;
+  }
+
+  /* Logo aligns left on tablet */
+  .footer-logo-link {
+    align-self: flex-start;
+  }
+
+  .footer-body {
+    padding: 52px clamp(24px, 5vw, 48px) 44px;
+  }
+
+  .footer-bottom-inner {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .footer-copyright {
+    flex: 1 1 100%;
+    text-align: center;
+    order: 3;
+  }
+
+  .footer-socials {
+    order: 1;
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .footer-legal-links {
+    order: 2;
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .footer-bottom {
+    padding: 20px clamp(24px, 5vw, 48px) 22px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   12. MOBILE  ≤ 640px  (single column)
+══════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+  .footer-spices-pattern {
+    height: clamp(50px, 13vw, 75px);
+  }
+
+  .footer-body {
+    padding: 40px 20px 36px;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 36px;
+  }
+
+  /* Brand centred on mobile */
+  .footer-col-brand {
+    grid-column: auto;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-logo-link {
+    align-self: center;
+  }
+
+  /* Other columns left-aligned */
+  .footer-col-links,
+  .footer-col-contact,
+  .footer-col-location {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .footer-bottom {
+    padding: 16px 20px 18px;
+  }
+
+  .footer-bottom-inner {
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 14px;
+    text-align: center;
+  }
+
+  .footer-copyright {
+    font-size: 11px;
+    order: 3;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .footer-socials {
+    order: 1;
+    gap: 10px;
+  }
+
+  .footer-legal-links {
+    order: 2;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+
+  .footer-legal-link {
+    font-size: 11px;
+  }
+}
+
+/* ══════════════════════════════════════════
+   13. VERY SMALL  ≤ 380px
+══════════════════════════════════════════ */
+
+@media (max-width: 380px) {
+
+  .footer-logo {
+    height: 50px;
+  }
+
+  .footer-body {
+    padding: 36px 16px 32px;
+  }
+
+  .footer-bottom {
+    padding: 14px 16px 16px;
+  }
+
+  .footer-social-link {
+    width: 32px;
+    height: 32px;
+  }
+}
