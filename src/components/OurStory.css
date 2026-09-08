@@ -1,0 +1,176 @@
+/* OurStory.css - Editorial Spice & Masala Brand Philosophy Section */
+
+.our-story-section {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #F4E7D9; /* Section theme background */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 100px clamp(24px, 5vw, 80px) 100px 0; /* 0px left padding to touch screen edge */
+  box-sizing: border-box;
+}
+
+.our-story-container {
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto 0 0; /* Flush to the left edge */
+  display: grid;
+  /* Left ~48%, Right ~52% */
+  grid-template-columns: minmax(480px, 660px) 1fr;
+  gap: clamp(36px, 5vw, 88px);
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Left Column: Food Photography Card */
+.our-story-visual-col {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.our-story-image-card {
+  width: 100%;
+  max-width: 660px; /* Noticeably larger image size */
+  aspect-ratio: 1 / 1.02;
+  border-radius: 0 28px 28px 0; /* Clean editorial rounded edge flush with screen boundary */
+  overflow: hidden;
+  box-shadow: 0 26px 52px -12px rgba(45, 25, 12, 0.2);
+  background-color: #e9dbc9;
+  position: relative;
+  transform: translateZ(0); /* Hardware acceleration */
+}
+
+.our-story-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transform: scale(1.02); /* Seamlessly crops off the 1px perimeter border artifact */
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+/* Subtle image scale-up on hover */
+.our-story-image-card:hover .our-story-image {
+  transform: scale(1.045);
+}
+
+/* Right Column: Editorial Typography & Content */
+.our-story-content-col {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.our-story-content-inner {
+  max-width: 620px;
+}
+
+.our-story-heading {
+  font-family: 'DM Serif Display', 'Fraunces', Georgia, serif;
+  font-size: clamp(30px, 3.4vw, 48px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: #0c1d2e;
+  margin: 0 0 24px 0;
+}
+
+.our-story-lead {
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: clamp(15.5px, 1.15vw, 17.5px);
+  line-height: 1.68;
+  color: #24384d;
+  margin: 0 0 20px 0;
+  font-weight: 400;
+}
+
+.our-story-tagline {
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: clamp(15.5px, 1.15vw, 17.5px);
+  line-height: 1.6;
+  color: #0c1d2e;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Tablet Responsiveness */
+@media (max-width: 960px) {
+  .our-story-section {
+    padding: 80px 28px;
+    min-height: auto;
+  }
+
+  .our-story-container {
+    gap: 36px;
+  }
+
+  .our-story-heading {
+    font-size: clamp(26px, 3.8vw, 36px);
+    margin-bottom: 20px;
+  }
+
+  .our-story-lead {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .our-story-tagline {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 0;
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .our-story-section {
+    padding: 50px 20px 70px;
+    min-height: auto;
+  }
+
+  .our-story-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .our-story-visual-col {
+    order: 1;
+    justify-content: center;
+  }
+
+  .our-story-content-col {
+    order: 2;
+  }
+
+  .our-story-image-card {
+    max-width: 100%;
+    aspect-ratio: 1 / 0.96;
+    border-radius: 20px;
+    box-shadow: 0 16px 36px -8px rgba(45, 25, 12, 0.16);
+  }
+
+  .our-story-heading {
+    font-size: clamp(26px, 7.5vw, 34px);
+    line-height: 1.18;
+    margin-bottom: 18px;
+  }
+
+  .our-story-lead {
+    font-size: 15.5px;
+    line-height: 1.65;
+    margin-bottom: 16px;
+  }
+
+  .our-story-tagline {
+    font-size: 15.5px;
+    line-height: 1.6;
+    margin-bottom: 0;
+  }
+}

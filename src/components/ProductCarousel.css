@@ -1,0 +1,322 @@
+/* ProductCarousel.css - Premium Reference Carousel */
+
+:root {
+  --carousel-transition-timing: cubic-bezier(0.25, 1, 0.33, 1);
+  --carousel-transition-duration: 650ms;
+  --item-width-desktop: 320px;
+  --item-gap-desktop: 44px;
+  --item-width-tablet: 280px;
+  --item-gap-tablet: 32px;
+  --item-width-mobile: 280px;
+  --item-gap-mobile: 20px;
+}
+
+.premium-carousel-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+}
+
+/* 6. Carousel Movement & Stage */
+.carousel-stage {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 30px 0 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.carousel-track {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--item-gap-desktop);
+  /* Movement equation keeps the active product dead-center */
+  transform: translateX(
+    calc(
+      50% - (var(--item-width-desktop) / 2) -
+      (var(--active-index) * (var(--item-width-desktop) + var(--item-gap-desktop)))
+    )
+  );
+  /* 5. Animation Speed & Transition Timing */
+  transition: transform var(--carousel-transition-duration) var(--carousel-transition-timing);
+  will-change: transform;
+}
+
+/* Base Carousel Item Card */
+.carousel-item {
+  position: relative;
+  flex: 0 0 var(--item-width-desktop);
+  width: var(--item-width-desktop);
+  min-height: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  padding: 28px 18px 28px;
+  border-radius: 24px;
+  /* 5. Transition Speed & GPU Acceleration */
+  transition:
+    transform var(--carousel-transition-duration) var(--carousel-transition-timing),
+    opacity var(--carousel-transition-duration) var(--carousel-transition-timing);
+  will-change: transform, opacity;
+}
+
+/* 4. Inactive Product Opacity & Scale */
+.carousel-item.is-inactive {
+  opacity: 0.78;
+  transform: scale(0.92);
+}
+
+.carousel-item.is-inactive:hover {
+  opacity: 0.92;
+}
+
+/* 1. Active Product Size */
+.carousel-item.is-active {
+  opacity: 1;
+  transform: scale(1.05);
+  cursor: default;
+  z-index: 5;
+}
+
+/* 2. Beige Rounded Background Panel */
+.card-panel-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #EFE4D6; /* Warm elegant beige matching reference */
+  border-radius: 24px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.9);
+  /* Smooth backdrop emergence */
+  transition:
+    opacity var(--carousel-transition-duration) var(--carousel-transition-timing),
+    transform var(--carousel-transition-duration) var(--carousel-transition-timing);
+  will-change: opacity, transform;
+  overflow: hidden;
+}
+
+.carousel-item.is-hovered .card-panel-backdrop,
+.carousel-item:hover .card-panel-backdrop {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Subtle Wheat Heritage Watermark behind floating product */
+.backdrop-wheat-icon {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250px;
+  height: 300px;
+  opacity: 0.55;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.backdrop-wheat-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* 3. Product Image Floating & Scaling */
+.product-visual-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 265px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.product-floating-image {
+  max-width: 94%;
+  max-height: 94%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  filter: drop-shadow(0 14px 20px rgba(43, 24, 16, 0.12));
+  transform: scale(1.02);
+  transition:
+    transform var(--carousel-transition-duration) var(--carousel-transition-timing),
+    filter var(--carousel-transition-duration) var(--carousel-transition-timing);
+  will-change: transform, filter;
+}
+
+.carousel-item.is-active .product-floating-image,
+.carousel-item:hover .product-floating-image {
+  transform: scale(1.14) translateY(-5px);
+  filter: drop-shadow(0 24px 32px rgba(43, 24, 16, 0.2));
+}
+
+/* Product Titles (Centered, wraps up to 2 lines) */
+.product-title-box {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 0 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.carousel-product-title {
+  font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0c1d2e;
+  text-align: center;
+  line-height: 1.35;
+  margin: 0;
+  max-width: 220px;
+}
+
+/* Pagination Dots */
+.carousel-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 28px;
+  padding: 6px 12px;
+}
+
+.carousel-dot {
+  width: 24px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: #ded5c8;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color 0.4s ease,
+    width 0.4s ease,
+    transform 0.4s ease;
+}
+
+.carousel-dot:hover {
+  background-color: #c4b9a8;
+}
+
+.carousel-dot.is-active {
+  background-color: #0c1d2e;
+  width: 28px;
+}
+
+/* Tablet (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .carousel-track {
+    gap: var(--item-gap-tablet);
+    transform: translateX(
+      calc(
+        50% - (var(--item-width-tablet) / 2) -
+        (var(--active-index) * (var(--item-width-tablet) + var(--item-gap-tablet)))
+      )
+    );
+  }
+
+  .carousel-item {
+    flex: 0 0 var(--item-width-tablet);
+    width: var(--item-width-tablet);
+    min-height: 430px;
+    padding: 24px 16px 28px;
+  }
+
+  .product-visual-wrapper {
+    height: 230px;
+  }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+  .carousel-stage {
+    padding: 16px 0 8px;
+    width: 100vw;
+  }
+
+  .carousel-track {
+    gap: var(--item-gap-mobile);
+    transform: translateX(
+      calc(
+        50% - (var(--item-width-mobile) / 2) -
+        (var(--active-index) * (var(--item-width-mobile) + var(--item-gap-mobile)))
+      )
+    );
+  }
+
+  .carousel-item {
+    flex: 0 0 var(--item-width-mobile);
+    width: var(--item-width-mobile);
+    min-height: 390px;
+    padding: 20px 14px 22px;
+  }
+
+  .carousel-item.is-inactive {
+    opacity: 0.45;
+    transform: scale(0.88);
+  }
+
+  .carousel-item.is-active {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+
+  .product-visual-wrapper {
+    height: 220px;
+    margin-bottom: 16px;
+  }
+
+  .carousel-product-title {
+    font-size: 13.5px;
+    letter-spacing: 0.06em;
+  }
+
+  .carousel-pagination {
+    margin-top: 18px;
+    gap: 8px;
+  }
+
+  .carousel-dot {
+    width: 22px;
+    height: 5px;
+  }
+
+  .carousel-dot.is-active {
+    width: 28px;
+  }
+}
+
+/* Accessibility: Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .carousel-track,
+  .carousel-item,
+  .card-panel-backdrop,
+  .product-floating-image,
+  .carousel-dot {
+    transition: none !important;
+  }
+}
