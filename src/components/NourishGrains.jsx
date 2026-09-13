@@ -1,7 +1,7 @@
 import React from 'react';
 import './NourishGrains.css';
 
-export default function NourishGrains() {
+export default function NourishGrains({ onSelectHealthMix }) {
   return (
     <section className="nourish-grains-section" id="nutrition" aria-labelledby="nourish-heading">
       <div className="nourish-grains-container">
@@ -21,7 +21,16 @@ export default function NourishGrains() {
             </p>
 
             <div className="nourish-actions">
-              <a href="#products" className="nourish-cta-btn">
+              <a 
+                href="#product/traditional-health-mix" 
+                className="nourish-cta-btn"
+                onClick={(e) => {
+                  if (onSelectHealthMix) {
+                    e.preventDefault();
+                    onSelectHealthMix();
+                  }
+                }}
+              >
                 EXPLORE HEALTH MIX
               </a>
             </div>

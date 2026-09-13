@@ -1,7 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import './ProductCarousel.css';
 
-export default function ProductCarousel({ products = [], initialIndex = 1 }) {
+export default function ProductCarousel({ 
+  products = [], 
+  initialIndex = 1,
+  onSelectProduct
+}) {
   const [activeIndex, setActiveIndex] = useState(
     Math.min(Math.max(0, initialIndex), Math.max(0, products.length - 1))
   );
@@ -22,6 +26,17 @@ export default function ProductCarousel({ products = [], initialIndex = 1 }) {
       setActiveIndex(index);
     }
   }, [products.length]);
+
+  const handleProductCardClick = (product, idx) => {
+    goToSlide(idx);
+    if (onSelectProduct && product.id) {
+      onSelectProduct(product.id);
+      const detailEl = document.getElementById('product-detail');
+      if (detailEl) {
+        detailEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   const handlePrev = useCallback(() => {
     setActiveIndex((prev) => (prev > 0 ? prev - 1 : products.length - 1));
@@ -101,7 +116,7 @@ export default function ProductCarousel({ products = [], initialIndex = 1 }) {
                   setHoveredIndex(idx);
                 }}
                 onMouseLeave={() => setHoveredIndex(null)}
-                onClick={() => goToSlide(idx)}
+                onClick={() => handleProductCardClick(product, idx)}
                 role="group"
                 aria-roledescription="slide"
                 aria-label={`${idx + 1} of ${products.length}: ${product.name}`}

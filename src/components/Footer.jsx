@@ -96,10 +96,6 @@ export default function Footer() {
           </div>
 
         </div>
-
-        {/* 1px separator between body and bottom bar — no shadow/blur */}
-        <div className="footer-separator" role="separator" aria-hidden="true" />
-
       </div>
 
       {/* ── Footer Bottom Bar ── */}

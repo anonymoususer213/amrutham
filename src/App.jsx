@@ -1,51 +1,157 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import SectionDivider from './components/SectionDivider';
 import ProductCarousel from './components/ProductCarousel';
+import ProductDetail from './components/ProductDetail';
 import OurStory from './components/OurStory';
 import NourishGrains from './components/NourishGrains';
 import Footer from './components/Footer';
+import { PRODUCTS } from './data/products';
 import './App.css';
 
-const PRODUCTS = [
+const CAROUSEL_PRODUCTS = [
   {
-    id: 'health-mix-powder',
-    name: 'HEALTH MIX POWDER',
-    image: '/assets/product-health-mix.png',
-    alt: 'Amrutham Health Mix Powder'
-  },
-  {
-    id: 'black-urad-dal-powder',
-    name: 'BLACK URAD DAL POWDER',
-    image: '/assets/product-black-urad.png',
-    alt: 'Amrutham Black Urad Dal Powder'
+    id: 'sambar-podi',
+    name: 'SAMBAR PODI',
+    image: '/assets/hero-spices.jpg',
+    alt: 'Amrutham Traditional Sambar Podi'
   },
   {
     id: 'traditional-health-mix',
     name: 'TRADITIONAL HEALTH MIX',
     image: '/assets/product-health-mix.png',
-    alt: 'Amrutham Traditional Health Mix'
+    alt: 'Amrutham Traditional Health Mix Sathu Maavu'
   },
   {
-    id: 'pure-urad-flour',
-    name: 'PURE BLACK URAD FLOUR',
+    id: 'black-urad-dal-powder',
+    name: 'BLACK URAD DAL POWDER',
     image: '/assets/product-black-urad.png',
-    alt: 'Amrutham Pure Black Urad Flour'
+    alt: 'Amrutham Black Urad Dal Kanji Powder'
   },
   {
-    id: 'organic-millet-mix',
-    name: 'ORGANIC MILLET MIX',
-    image: '/assets/product-health-mix.png',
-    alt: 'Amrutham Organic Millet Mix'
+    id: 'rasam-powder',
+    name: 'AROMATIC RASAM POWDER',
+    image: '/assets/our-story-masala.jpg',
+    alt: 'Amrutham Aromatic Rasam Podi'
+  },
+  {
+    id: 'idli-milagai-podi',
+    name: 'IDLI MILAGAI PODI',
+    image: '/assets/hero-spices.jpg',
+    alt: 'Amrutham Crunchy Idli Gunpowder'
   }
 ];
 
 export default function App() {
+  const [currentView, setCurrentView] = useState('home'); // 'home' | 'product-detail'
+  const [selectedProductId, setSelectedProductId] = useState('sambar-podi');
+
+  // Handle URL hash routing (e.g. #product/sambar-podi or #products-page)
+  const handleHashChange = useCallback(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#product/')) {
+      const pId = hash.replace('#product/', '').trim();
+      if (pId) {
+        setSelectedProductId(pId);
+        setCurrentView('product-detail');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+    }
+    if (hash === '#products-page' || hash === '#all-products') {
+      setCurrentView('product-detail');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    // Otherwise on regular anchor or home
+    if (currentView === 'product-detail' && (hash === '' || hash === '#hero' || hash === '#home')) {
+      setCurrentView('home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentView]);
+
+  useEffect(() => {
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handleHashChange);
+    };
+  }, [handleHashChange]);
+
+  // Scroll smoothly to target section on homepage
+  const scrollToSection = (sectionId) => {
+    if (currentView === 'product-detail') {
+      setCurrentView('home');
+      window.location.hash = `#${sectionId}`;
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 60);
+    } else {
+      window.location.hash = `#${sectionId}`;
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  // Navigate to Dedicated Product Detail Page
+  const openProductPage = (productId = 'sambar-podi') => {
+    setSelectedProductId(productId);
+    setCurrentView('product-detail');
+    window.location.hash = `#product/${productId}`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Return to pristine Homepage
+  const openHomePage = () => {
+    setCurrentView('home');
+    window.location.hash = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  /* ══════════════════════════════════════════════════════════════════
+     VIEW 2: DEDICATED PRODUCT DETAIL PAGE (Opened as a separate page)
+     ══════════════════════════════════════════════════════════════════ */
+  if (currentView === 'product-detail') {
+    return (
+      <div className="app-container">
+        <ProductDetail 
+          productId={selectedProductId}
+          onSelectProduct={(pId) => {
+            setSelectedProductId(pId);
+            window.location.hash = `#product/${pId}`;
+          }}
+          onBackToHome={openHomePage}
+        />
+        <Footer />
+      </div>
+    );
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     VIEW 1: PRISTINE ORIGINAL HOMEPAGE (Completely undisturbed design)
+     ══════════════════════════════════════════════════════════════════ */
   return (
     <div className="app-container">
       {/* 1. Full-Screen Hero Section */}
       <section className="section-hero" id="hero">
-        <Header />
+        <Header onNavigate={(dest) => {
+          if (dest === 'home') {
+            openHomePage();
+          } else if (dest === 'products') {
+            scrollToSection('products');
+          } else if (dest === 'story') {
+            scrollToSection('story');
+          } else if (dest === 'contact') {
+            scrollToSection('contact');
+          }
+        }} />
 
         <main className="hero-section">
           <div className="hero-container">
@@ -56,9 +162,13 @@ export default function App() {
                 every spoon.
               </h1>
               <div className="hero-actions">
-                <a href="#products" className="hero-cta-btn">
+                <button 
+                  type="button" 
+                  onClick={() => scrollToSection('products')}
+                  className="hero-cta-btn"
+                >
                   OUR PRODUCTS
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -85,7 +195,11 @@ export default function App() {
           </h2>
 
           {/* Premium Reference Carousel Interaction */}
-          <ProductCarousel products={PRODUCTS} initialIndex={1} />
+          <ProductCarousel 
+            products={CAROUSEL_PRODUCTS} 
+            initialIndex={0} 
+            onSelectProduct={(id) => openProductPage(id)}
+          />
         </div>
       </section>
 
@@ -113,9 +227,9 @@ export default function App() {
       </div>
 
       {/* 7. Full-Screen Traditional Grains Nutrition Section */}
-      <NourishGrains />
+      <NourishGrains onSelectHealthMix={() => openProductPage('traditional-health-mix')} />
 
-      {/* 8. Premium Footer */}
+      {/* 8. Premium Footer with Botanical Wave */}
       <Footer />
     </div>
   );

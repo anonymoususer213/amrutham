@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './Header.css';
 
-export default function Header() {
+export default function Header({ onNavigate }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
-    { label: 'PRODUCT', href: '#products' },
-    { label: 'ABOUT US', href: '#story' },
-    { label: 'CONTACT', href: '#contact' },
+    { label: 'PRODUCTS', href: '#products', action: 'products' },
+    { label: 'ABOUT US', href: '#story', action: 'story' },
+    { label: 'CONTACT', href: '#contact', action: 'contact' },
   ];
 
   // Close mobile menu on resize or Esc key
@@ -26,15 +26,28 @@ export default function Header() {
     };
   }, []);
 
-  const handleLinkClick = () => {
+  const handleLinkClick = (item) => {
     setIsMobileMenuOpen(false);
+    if (onNavigate && item.action) {
+      onNavigate(item.action);
+    }
   };
 
   return (
     <header className="site-header">
       <div className="header-container">
         {/* Logo */}
-        <a href="/" className="logo-link" aria-label="Amrutham Home">
+        <a 
+          href="/" 
+          className="logo-link" 
+          aria-label="Amrutham Home"
+          onClick={(e) => {
+            if (onNavigate) {
+              e.preventDefault();
+              onNavigate('home');
+            }
+          }}
+        >
           <img 
             src="/assets/amrutham-logo.png" 
             alt="AMRUTHAM" 
@@ -49,6 +62,12 @@ export default function Header() {
               key={item.label}
               href={item.href}
               className="nav-pill-btn"
+              onClick={(e) => {
+                if (onNavigate && item.action) {
+                  e.preventDefault();
+                  onNavigate(item.action);
+                }
+              }}
             >
               {item.label}
             </a>
@@ -80,7 +99,7 @@ export default function Header() {
               key={`mob-${item.label}`}
               href={item.href}
               className="mobile-nav-item"
-              onClick={handleLinkClick}
+              onClick={() => handleLinkClick(item)}
             >
               {item.label}
             </a>
@@ -88,7 +107,7 @@ export default function Header() {
           <a
             href="#products"
             className="mobile-nav-cta"
-            onClick={handleLinkClick}
+            onClick={() => handleLinkClick({ action: 'products' })}
           >
             EXPLORE PRODUCTS
           </a>
