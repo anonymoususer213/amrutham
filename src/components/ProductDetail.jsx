@@ -3,7 +3,7 @@ import { PRODUCTS, AMRUTHAM_PHONE_RAW } from '../data/products';
 import './ProductDetail.css';
 
 export default function ProductDetail({ 
-  productId = 'sambar-podi', 
+  productId = 'traditional-health-mix', 
   onSelectProduct,
   onBackToHome
 }) {

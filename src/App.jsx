@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Header from './components/Header';
 import SectionDivider from './components/SectionDivider';
 import ProductCarousel from './components/ProductCarousel';
@@ -11,12 +11,6 @@ import './App.css';
 
 const CAROUSEL_PRODUCTS = [
   {
-    id: 'sambar-podi',
-    name: 'SAMBAR PODI',
-    image: '/assets/hero-spices.jpg',
-    alt: 'Amrutham Traditional Sambar Podi'
-  },
-  {
     id: 'traditional-health-mix',
     name: 'TRADITIONAL HEALTH MIX',
     image: '/assets/product-health-mix.png',
@@ -27,30 +21,23 @@ const CAROUSEL_PRODUCTS = [
     name: 'BLACK URAD DAL POWDER',
     image: '/assets/product-black-urad.png',
     alt: 'Amrutham Black Urad Dal Kanji Powder'
-  },
-  {
-    id: 'rasam-powder',
-    name: 'AROMATIC RASAM POWDER',
-    image: '/assets/our-story-masala.jpg',
-    alt: 'Amrutham Aromatic Rasam Podi'
-  },
-  {
-    id: 'idli-milagai-podi',
-    name: 'IDLI MILAGAI PODI',
-    image: '/assets/hero-spices.jpg',
-    alt: 'Amrutham Crunchy Idli Gunpowder'
   }
 ];
 
 export default function App() {
   const [currentView, setCurrentView] = useState('home'); // 'home' | 'product-detail'
-  const [selectedProductId, setSelectedProductId] = useState('sambar-podi');
+  const [selectedProductId, setSelectedProductId] = useState('traditional-health-mix');
 
-  // Handle URL hash routing (e.g. #product/sambar-podi or #products-page)
+  // Known product IDs for validation (allowlist)
+  const validProductIds = useMemo(() => PRODUCTS.map(p => p.id), []);
+
+  // Handle URL hash routing (e.g. #product/traditional-health-mix or #products-page)
   const handleHashChange = useCallback(() => {
     const hash = window.location.hash;
     if (hash.startsWith('#product/')) {
-      const pId = hash.replace('#product/', '').trim();
+      const rawId = hash.replace('#product/', '').trim();
+      // Validate against known product IDs only (security: prevent arbitrary input)
+      const pId = validProductIds.includes(rawId) ? rawId : validProductIds[0];
       if (pId) {
         setSelectedProductId(pId);
         setCurrentView('product-detail');
@@ -68,7 +55,7 @@ export default function App() {
       setCurrentView('home');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [currentView]);
+  }, [currentView, validProductIds]);
 
   useEffect(() => {
     handleHashChange();
@@ -101,10 +88,12 @@ export default function App() {
   };
 
   // Navigate to Dedicated Product Detail Page
-  const openProductPage = (productId = 'sambar-podi') => {
-    setSelectedProductId(productId);
+  const openProductPage = (productId = 'traditional-health-mix') => {
+    // Validate against known product IDs (security: prevent arbitrary input)
+    const safeId = validProductIds.includes(productId) ? productId : validProductIds[0];
+    setSelectedProductId(safeId);
     setCurrentView('product-detail');
-    window.location.hash = `#product/${productId}`;
+    window.location.hash = `#product/${safeId}`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -124,8 +113,10 @@ export default function App() {
         <ProductDetail 
           productId={selectedProductId}
           onSelectProduct={(pId) => {
-            setSelectedProductId(pId);
-            window.location.hash = `#product/${pId}`;
+            // Validate against known product IDs (security: prevent arbitrary input)
+            const safeId = validProductIds.includes(pId) ? pId : validProductIds[0];
+            setSelectedProductId(safeId);
+            window.location.hash = `#product/${safeId}`;
           }}
           onBackToHome={openHomePage}
         />
