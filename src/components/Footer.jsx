@@ -1,9 +1,9 @@
 import React from 'react';
 import './Footer.css';
 
-export default function Footer() {
+export default function Footer({ onNavigate }) {
   return (
-    <footer className="site-footer" id="contact" aria-label="Site Footer">
+    <footer className="site-footer" id="footer" aria-label="Site Footer">
 
       {/* ── Spice Garden Botanical Decorative Border ── */}
       <div className="footer-spices-border" aria-hidden="true">
@@ -16,7 +16,17 @@ export default function Footer() {
 
           {/* Column 1 — Brand / Logo */}
           <div className="footer-col footer-col-brand">
-            <a href="#hero" className="footer-logo-link" aria-label="Amrutham — Back to top">
+            <a 
+              href="/" 
+              className="footer-logo-link" 
+              aria-label="Amrutham — Back to home"
+              onClick={(e) => {
+                if (onNavigate) {
+                  e.preventDefault();
+                  onNavigate('home');
+                }
+              }}
+            >
               <img
                 src="/assets/amrutham-logo.png"
                 alt="Amrutham — Traditional Indian Masala"
@@ -34,9 +44,48 @@ export default function Footer() {
             <h3 className="footer-col-heading">Quick Links</h3>
             <nav aria-label="Footer navigation">
               <ul className="footer-nav-list">
-                <li><a href="#products" className="footer-nav-link">Products</a></li>
-                <li><a href="#story"    className="footer-nav-link">Our Story</a></li>
-                <li><a href="#contact"  className="footer-nav-link">Contact Us</a></li>
+                <li>
+                  <a 
+                    href="#products" 
+                    className="footer-nav-link"
+                    onClick={(e) => {
+                      if (onNavigate) {
+                        e.preventDefault();
+                        onNavigate('products');
+                      }
+                    }}
+                  >
+                    Products
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="#story" 
+                    className="footer-nav-link"
+                    onClick={(e) => {
+                      if (onNavigate) {
+                        e.preventDefault();
+                        onNavigate('story');
+                      }
+                    }}
+                  >
+                    Our Story
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="/contact" 
+                    className="footer-nav-link"
+                    onClick={(e) => {
+                      if (onNavigate) {
+                        e.preventDefault();
+                        onNavigate('contact');
+                      }
+                    }}
+                  >
+                    Contact Us
+                  </a>
+                </li>
               </ul>
             </nav>
           </div>

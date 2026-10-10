@@ -5,10 +5,10 @@ export const PRODUCTS = [
   {
     id: 'traditional-health-mix',
     name: 'Traditional Health Mix',
-    tamilName: 'சத்து மாவு (18 பாரம்பரிய தானியங்கள்)',
+    tamilName: 'பாரம்பரிய சத்து மாவு',
     category: 'HERITAGE HEALTH MIX',
-    tagline: '18 sprouted whole grains, millets, pulses, and nutrient-dense dry fruits',
-    shortDescription: 'A wholesome nourishing breakfast porridge crafted with 18 sprouted whole grains, native millets, and dry fruits. Slow-roasted over firewood to maximize bioavailability and digestive wellness for all age groups.',
+    tagline: 'A wholesome blend of millets, pulses, nuts & seeds',
+    shortDescription: 'A wholesome nourishing breakfast porridge crafted with a rich blend of millets, whole grains, pulses, and nutrient-dense nuts. Slow-roasted over firewood to maximize bioavailability and digestive wellness for all age groups.',
     fullDescription: 'Amrutham Sathu Maavu is prepared strictly without added sugar, maltodextrin, milk solids, or synthetic flavoring. A complete wholesome meal for growing children, active adults, and elders seeking authentic sustained energy.',
     defaultSize: '250g',
     packSizes: [
@@ -28,7 +28,7 @@ export const PRODUCTS = [
     topBadges: [
       {
         title: 'Made with',
-        subtitle: '18 Sprouted Grains',
+        subtitle: 'Millets, Pulses & Nuts',
         icon: 'grain'
       },
       {
@@ -63,7 +63,7 @@ export const PRODUCTS = [
       {
         id: 'ingredients',
         title: 'INGREDIENTS',
-        content: 'Sprouted Ragi (Finger Millet), Sprouted Kambu (Pearl Millet), Red Rice, Sprouted Wheat, Green Gram, Fried Gram, Soya Bean, Barley, Maize, Foxtail Millet, Little Millet, Kodo Millet, Almonds, Cashewnuts, Cardamom (Elaichi), and Dry Ginger (Sukku).'
+        content: 'Millets, Ragi, Bajra, Corn, Jowar, Wheat, Red Rice, Barley, Sago, Green Gram, Fried Gram, Groundnut, Almond, Cashewnut, and Cardamom.'
       },
       {
         id: 'nutritional-info',

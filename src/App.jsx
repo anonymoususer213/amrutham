@@ -6,6 +6,7 @@ import ProductDetail from './components/ProductDetail';
 import OurStory from './components/OurStory';
 import NourishGrains from './components/NourishGrains';
 import Footer from './components/Footer';
+import ContactPage from './components/ContactPage';
 import { PRODUCTS } from './data/products';
 import './App.css';
 
@@ -25,18 +26,51 @@ const CAROUSEL_PRODUCTS = [
 ];
 
 export default function App() {
-  const [currentView, setCurrentView] = useState('home'); // 'home' | 'product-detail'
-  const [selectedProductId, setSelectedProductId] = useState('traditional-health-mix');
+  const [currentView, setCurrentView] = useState(() => {
+    // Initial view based on pathname or hash
+    if (typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      const hash = window.location.hash;
+      if (pathname === '/contact' || pathname.startsWith('/contact') || hash === '#contact') {
+        return 'contact';
+      }
+      if (hash.startsWith('#product/') || hash === '#products-page' || hash === '#all-products') {
+        return 'product-detail';
+      }
+    }
+    return 'home';
+  });
+
+  const [selectedProductId, setSelectedProductId] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      if (hash.startsWith('#product/')) {
+        const rawId = hash.replace('#product/', '').trim();
+        const found = PRODUCTS.find(p => p.id === rawId);
+        if (found) return found.id;
+      }
+    }
+    return 'traditional-health-mix';
+  });
 
   // Known product IDs for validation (allowlist)
   const validProductIds = useMemo(() => PRODUCTS.map(p => p.id), []);
 
-  // Handle URL hash routing (e.g. #product/traditional-health-mix or #products-page)
-  const handleHashChange = useCallback(() => {
+  // Handle URL pathname and hash routing
+  const handleLocationChange = useCallback(() => {
+    const pathname = window.location.pathname;
     const hash = window.location.hash;
+
+    // 1. Dedicated Contact page route (/contact or #contact)
+    if (pathname === '/contact' || pathname.startsWith('/contact') || hash === '#contact') {
+      setCurrentView('contact');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // 2. Dedicated Product Detail route (#product/:id)
     if (hash.startsWith('#product/')) {
       const rawId = hash.replace('#product/', '').trim();
-      // Validate against known product IDs only (security: prevent arbitrary input)
       const pId = validProductIds.includes(rawId) ? rawId : validProductIds[0];
       if (pId) {
         setSelectedProductId(pId);
@@ -45,33 +79,17 @@ export default function App() {
         return;
       }
     }
+
     if (hash === '#products-page' || hash === '#all-products') {
       setCurrentView('product-detail');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    // Otherwise on regular anchor or home
-    if (currentView === 'product-detail' && (hash === '' || hash === '#hero' || hash === '#home')) {
-      setCurrentView('home');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [currentView, validProductIds]);
 
-  useEffect(() => {
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    window.addEventListener('popstate', handleHashChange);
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-      window.removeEventListener('popstate', handleHashChange);
-    };
-  }, [handleHashChange]);
-
-  // Scroll smoothly to target section on homepage
-  const scrollToSection = (sectionId) => {
-    if (currentView === 'product-detail') {
-      setCurrentView('home');
-      window.location.hash = `#${sectionId}`;
+    // 3. Homepage view
+    setCurrentView('home');
+    if (hash && hash !== '#hero' && hash !== '#home') {
+      const sectionId = hash.replace('#', '');
       setTimeout(() => {
         const el = document.getElementById(sectionId);
         if (el) {
@@ -79,33 +97,104 @@ export default function App() {
         }
       }, 60);
     } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [validProductIds]);
+
+  useEffect(() => {
+    handleLocationChange();
+    window.addEventListener('hashchange', handleLocationChange);
+    window.addEventListener('popstate', handleLocationChange);
+    return () => {
+      window.removeEventListener('hashchange', handleLocationChange);
+      window.removeEventListener('popstate', handleLocationChange);
+    };
+  }, [handleLocationChange]);
+
+  // Navigate to Dedicated Contact Page (/contact)
+  const openContactPage = useCallback(() => {
+    setCurrentView('contact');
+    if (window.location.pathname !== '/contact') {
+      window.history.pushState(null, '', '/contact');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  // Return to pristine Homepage (/)
+  const openHomePage = useCallback(() => {
+    setCurrentView('home');
+    if (window.location.pathname !== '/' || window.location.hash !== '') {
+      window.history.pushState(null, '', '/');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  // Scroll smoothly to target section on homepage
+  const scrollToSection = useCallback((sectionId) => {
+    if (currentView !== 'home') {
+      setCurrentView('home');
+      window.history.pushState(null, '', `/#${sectionId}`);
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 80);
+    } else {
       window.location.hash = `#${sectionId}`;
       const el = document.getElementById(sectionId);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       }
     }
-  };
+  }, [currentView]);
 
   // Navigate to Dedicated Product Detail Page
-  const openProductPage = (productId = 'traditional-health-mix') => {
-    // Validate against known product IDs (security: prevent arbitrary input)
+  const openProductPage = useCallback((productId = 'traditional-health-mix') => {
     const safeId = validProductIds.includes(productId) ? productId : validProductIds[0];
     setSelectedProductId(safeId);
     setCurrentView('product-detail');
-    window.location.hash = `#product/${safeId}`;
+    if (window.location.pathname !== '/') {
+      window.history.pushState(null, '', `/#product/${safeId}`);
+    } else {
+      window.location.hash = `#product/${safeId}`;
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, [validProductIds]);
 
-  // Return to pristine Homepage
-  const openHomePage = () => {
-    setCurrentView('home');
-    window.location.hash = '';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  // Universal Navigation Dispatcher
+  const handleNavigate = useCallback((dest) => {
+    if (dest === 'home') {
+      openHomePage();
+    } else if (dest === 'contact') {
+      openContactPage();
+    } else if (dest === 'products') {
+      scrollToSection('products');
+    } else if (dest === 'story') {
+      scrollToSection('story');
+    }
+  }, [openHomePage, openContactPage, scrollToSection]);
 
   /* ══════════════════════════════════════════════════════════════════
-     VIEW 2: DEDICATED PRODUCT DETAIL PAGE (Opened as a separate page)
+     VIEW 3: DEDICATED CONTACT PAGE (/contact)
+     ══════════════════════════════════════════════════════════════════ */
+  if (currentView === 'contact') {
+    return (
+      <div className="app-container contact-view-container">
+        <Header 
+          currentView="contact"
+          onNavigate={handleNavigate}
+        />
+        <main id="main-content">
+          <ContactPage />
+        </main>
+        <Footer onNavigate={handleNavigate} />
+      </div>
+    );
+  }
+
+  /* ══════════════════════════════════════════════════════════════════
+     VIEW 2: DEDICATED PRODUCT DETAIL PAGE (#product/:id)
      ══════════════════════════════════════════════════════════════════ */
   if (currentView === 'product-detail') {
     return (
@@ -113,36 +202,28 @@ export default function App() {
         <ProductDetail 
           productId={selectedProductId}
           onSelectProduct={(pId) => {
-            // Validate against known product IDs (security: prevent arbitrary input)
             const safeId = validProductIds.includes(pId) ? pId : validProductIds[0];
             setSelectedProductId(safeId);
             window.location.hash = `#product/${safeId}`;
           }}
           onBackToHome={openHomePage}
         />
-        <Footer />
+        <Footer onNavigate={handleNavigate} />
       </div>
     );
   }
 
   /* ══════════════════════════════════════════════════════════════════
-     VIEW 1: PRISTINE ORIGINAL HOMEPAGE (Completely undisturbed design)
+     VIEW 1: PRISTINE ORIGINAL HOMEPAGE
      ══════════════════════════════════════════════════════════════════ */
   return (
     <div className="app-container">
       {/* 1. Full-Screen Hero Section */}
       <section className="section-hero" id="hero">
-        <Header onNavigate={(dest) => {
-          if (dest === 'home') {
-            openHomePage();
-          } else if (dest === 'products') {
-            scrollToSection('products');
-          } else if (dest === 'story') {
-            scrollToSection('story');
-          } else if (dest === 'contact') {
-            scrollToSection('contact');
-          }
-        }} />
+        <Header 
+          currentView="home"
+          onNavigate={handleNavigate}
+        />
 
         <main className="hero-section">
           <div className="hero-container">
@@ -221,7 +302,7 @@ export default function App() {
       <NourishGrains onSelectHealthMix={() => openProductPage('traditional-health-mix')} />
 
       {/* 8. Premium Footer with Botanical Wave */}
-      <Footer />
+      <Footer onNavigate={handleNavigate} />
     </div>
   );
 }

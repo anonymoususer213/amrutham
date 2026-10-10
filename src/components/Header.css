@@ -66,6 +66,16 @@
   transform: scale(0.98);
 }
 
+.nav-pill-btn.is-active {
+  background-color: #1A3E2F;
+  color: #ffffff;
+}
+
+.nav-pill-btn.is-active:hover {
+  background-color: #133224;
+  color: #ffffff;
+}
+
 /* Mobile Toggle - Hidden on Desktop */
 .mobile-menu-toggle {
   display: none;
@@ -184,6 +194,11 @@
   .mobile-nav-item:active {
     color: #c8521d;
     transform: scale(0.96);
+  }
+
+  .mobile-nav-item.is-active {
+    color: #1A3E2F;
+    font-weight: 800;
   }
 
   .mobile-nav-cta {

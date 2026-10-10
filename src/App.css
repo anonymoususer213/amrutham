@@ -6,6 +6,10 @@
   flex-direction: column;
 }
 
+.contact-view-container {
+  background-color: #FEF7E9;
+}
+
 /* Full-Screen Vertical Sections */
 .section-hero {
   min-height: 100vh;

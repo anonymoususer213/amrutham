@@ -9,6 +9,7 @@ export default function ProductCarousel({
   const [activeIndex, setActiveIndex] = useState(
     Math.min(Math.max(0, initialIndex), Math.max(0, products.length - 1))
   );
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   // Synchronize initialIndex if products change
   useEffect(() => {
@@ -79,8 +80,6 @@ export default function ProductCarousel({
   };
 
   if (!products || products.length === 0) return null;
-
-  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   return (
     <div

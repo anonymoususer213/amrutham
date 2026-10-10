@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './Header.css';
 
-export default function Header({ onNavigate }) {
+export default function Header({ onNavigate, currentView = 'home' }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     { label: 'PRODUCTS', href: '#products', action: 'products' },
     { label: 'ABOUT US', href: '#story', action: 'story' },
-    { label: 'CONTACT', href: '#contact', action: 'contact' },
+    { label: 'CONTACT', href: '/contact', action: 'contact' },
   ];
 
   // Close mobile menu on resize or Esc key
@@ -61,7 +61,8 @@ export default function Header({ onNavigate }) {
             <a
               key={item.label}
               href={item.href}
-              className="nav-pill-btn"
+              className={`nav-pill-btn ${currentView === item.action ? 'is-active' : ''}`}
+              aria-current={currentView === item.action ? 'page' : undefined}
               onClick={(e) => {
                 if (onNavigate && item.action) {
                   e.preventDefault();
@@ -98,8 +99,12 @@ export default function Header({ onNavigate }) {
             <a
               key={`mob-${item.label}`}
               href={item.href}
-              className="mobile-nav-item"
-              onClick={() => handleLinkClick(item)}
+              className={`mobile-nav-item ${currentView === item.action ? 'is-active' : ''}`}
+              aria-current={currentView === item.action ? 'page' : undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                handleLinkClick(item);
+              }}
             >
               {item.label}
             </a>
