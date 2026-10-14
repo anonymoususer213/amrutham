@@ -7,29 +7,13 @@ import './ContactPage.css';
 const LOCATIONS = [
   {
     id: 'manufacturing-mill',
-    title: 'Thirupandiyur Workshop & Mill',
+    title: 'Amrutham Masala & Foods',
     subheading: 'Manufacturing Unit & Traditional Flour Mill',
     coordinates: '12°57\'29.6"N 79°52\'53.9"E',
     addressLines: [
       'No 4, Vadamangalam Main Road',
       'Thirupandiyur Village, Kadampathur Block',
       'Thiruvallur District, Tamil Nadu – 602108'
-    ],
-    phone: AMRUTHAM_PHONE,
-    phoneRaw: AMRUTHAM_PHONE_RAW,
-    whatsapp: AMRUTHAM_PHONE,
-    whatsappRaw: AMRUTHAM_PHONE_RAW,
-    email: 'amruthammasala@gmail.com',
-    hours: 'Monday – Saturday: 9:00 AM – 7:00 PM IST'
-  },
-  {
-    id: 'support-orders',
-    title: 'Customer Care & Direct Inquiries',
-    subheading: 'Support, Retail & Bulk Orders',
-    coordinates: 'Kadampathur Block, Tamil Nadu',
-    addressLines: [
-      'Dispatch Center: Thirupandiyur Village',
-      'Kadampathur Block, Tamil Nadu – 602108'
     ],
     phone: AMRUTHAM_PHONE,
     phoneRaw: AMRUTHAM_PHONE_RAW,
@@ -55,6 +39,8 @@ const PRIMARY_COORDS = {
   label: '12°57\'29.6"N 79°52\'53.9"E'
 };
 
+const WEB3FORMS_ACCESS_KEY = '2b78a0e3-3f7b-4c5d-ac16-f8859de41e14';
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
@@ -66,7 +52,9 @@ export default function ContactPage() {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  const [submissionState, setSubmissionState] = useState('idle'); // 'idle' | 'notice'
+  const [submissionState, setSubmissionState] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
+  const [submissionError, setSubmissionError] = useState('');
+  const [lastSentPayload, setLastSentPayload] = useState(null);
   const [copiedNotice, setCopiedNotice] = useState(false);
 
   // Map refs
@@ -91,11 +79,26 @@ export default function ContactPage() {
       attributionControl: false
     });
 
-    // Standard free OpenStreetMap tiles (100% free, zero API key required, no watermarks)
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // High-reliability tile layer compatible with online production hosting (Vercel, Netlify, GitHub Pages, HTTPS)
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      subdomains: ['a', 'b', 'c'],
       maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+      attribution: '&copy; OpenStreetMap contributors',
+      referrerPolicy: 'no-referrer'
+    });
+    osmLayer.addTo(map);
+
+    // Fallback if OpenStreetMap is rate-limited or blocked on public host
+    osmLayer.on('tileerror', () => {
+      if (!map._cartoFallbackAdded) {
+        map._cartoFallbackAdded = true;
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+          subdomains: 'abcd',
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap, &copy; CARTO'
+        }).addTo(map);
+      }
+    });
 
     // Custom teardrop pin matching the reference screenshot:
     // - White rounded pill tooltip badge above
@@ -121,9 +124,9 @@ export default function ContactPage() {
       </div>
     `;
 
-    // 1. Primary Verified Location: Thirupandiyur Workshop & Mill at 12°57'29.6"N 79°52'53.9"E
+    // 1. Primary Verified Location: Amrutham Masala & Foods at 12°57'29.6"N 79°52'53.9"E
     const primaryIcon = L.divIcon({
-      html: createMarkerHtml('Amrutham Workshop & Mill', true),
+      html: createMarkerHtml('Amrutham Masala & Foods', true),
       className: 'template-leaflet-div-icon',
       iconSize: [210, 84],
       iconAnchor: [105, 82],
@@ -135,9 +138,20 @@ export default function ContactPage() {
       setCurrentZoom(map.getZoom());
     });
 
+    // Ensure map tiles recalculate immediately once container layout renders in production
+    const timer1 = setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
+
+    const timer2 = setTimeout(() => {
+      map.invalidateSize();
+    }, 500);
+
     mapInstanceRef.current = map;
 
     return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
       map.remove();
       mapInstanceRef.current = null;
     };
@@ -206,7 +220,7 @@ export default function ContactPage() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setTouched({
@@ -227,7 +241,49 @@ export default function ContactPage() {
       return;
     }
 
-    setSubmissionState('notice');
+    // Submit to Web3Forms silently in the background
+    setSubmissionState('submitting');
+    setSubmissionError('');
+
+    const submissionData = {
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      company: formData.company.trim(),
+      topic: formData.topic || 'General Inquiry',
+      message: formData.message.trim()
+    };
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: `[${submissionData.topic}] New Website Message from ${submissionData.name}`,
+          from_name: submissionData.name,
+          name: submissionData.name,
+          email: submissionData.email,
+          company: submissionData.company || 'N/A',
+          topic: submissionData.topic,
+          message: submissionData.message
+        })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setLastSentPayload(submissionData);
+        setSubmissionState('success');
+      } else {
+        setSubmissionState('error');
+        setSubmissionError(result.message || 'Failed to deliver message. Please try WhatsApp or email directly.');
+      }
+    } catch (err) {
+      setSubmissionState('error');
+      setSubmissionError('Network error while sending message. Please try WhatsApp or email directly.');
+    }
   };
 
   const formattedMessage = `Topic: ${formData.topic || 'General Inquiry'}
@@ -365,29 +421,47 @@ Message: ${formData.message.trim()}`;
                 Send us a message
               </h2>
 
-              {submissionState === 'notice' ? (
-                /* ── Honest Submission State Notice ── */
-                <div className="form-editorial-notice" role="region" aria-label="Message Status">
+              {submissionState === 'success' ? (
+                /* ── Success State Notice: Holds message for WhatsApp or copy ── */
+                <div className="form-editorial-notice" role="region" aria-label="Message Delivered">
                   <div className="notice-editorial-header">
-                    <span className="notice-badge">MESSAGE PREPARED</span>
-                    <h3 className="notice-headline">Almost There!</h3>
+                    <span className="notice-badge" style={{ backgroundColor: '#2e7d32', color: '#fff' }}>DELIVERED TO GMAIL</span>
+                    <h3 className="notice-headline">Message Delivered to our Email!</h3>
                   </div>
 
                   <p className="notice-text">
-                    Thank you, <strong>{formData.name}</strong>. Because this site operates as a static client without an automated backend email gateway, messages cannot be delivered silently behind the scenes.
+                    Thank you, <strong>{lastSentPayload?.name || formData.name}</strong>. Your message was delivered directly to <strong>amruthammasala@gmail.com</strong>.
                   </p>
 
                   <p className="notice-text">
-                    Your complete message has been formatted. Choose how you would like to send it directly to our team:
+                    <strong>Want an instant response?</strong> We have held your message below. You can send this exact message directly to our WhatsApp support team with one click:
                   </p>
 
-                  <div className="notice-preview-box">
-                    <pre className="notice-preview-text">{formattedMessage}</pre>
+                  {/* Held Message Preview */}
+                  <div className="notice-preview-box" style={{ margin: '14px 0' }}>
+                    <div style={{
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      color: 'var(--text-muted, #71717a)',
+                      marginBottom: '6px'
+                    }}>
+                      Held Message:
+                    </div>
+                    <pre className="notice-preview-text" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}>
+{`Topic: ${lastSentPayload?.topic || formData.topic}
+Name: ${lastSentPayload?.name || formData.name}
+Email: ${lastSentPayload?.email || formData.email}${lastSentPayload?.company ? `\nCompany: ${lastSentPayload.company}` : ''}
+Message: ${lastSentPayload?.message || formData.message}`}
+                    </pre>
                   </div>
 
                   <div className="notice-action-row">
                     <a
-                      href={directWhatsAppUrl}
+                      href={`https://wa.me/${AMRUTHAM_PHONE_RAW}?text=${encodeURIComponent(
+                        `Hi Amrutham, I sent this message on your website:\n\nTopic: ${lastSentPayload?.topic || formData.topic}\nName: ${lastSentPayload?.name || formData.name}\nEmail: ${lastSentPayload?.email || formData.email}${lastSentPayload?.company ? `\nCompany: ${lastSentPayload.company}` : ''}\nMessage: ${lastSentPayload?.message || formData.message}`
+                      )}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="notice-pill-btn whatsapp-btn"
@@ -395,23 +469,18 @@ Message: ${formData.message.trim()}`;
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
                       </svg>
-                      <span>Send on WhatsApp</span>
-                    </a>
-
-                    <a
-                      href={directMailtoUrl}
-                      className="notice-pill-btn email-btn"
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                        <polyline points="22,6 12,13 2,6" />
-                      </svg>
-                      <span>Send via Email</span>
+                      <span>Send via WhatsApp</span>
                     </a>
 
                     <button
                       type="button"
-                      onClick={handleCopyMessage}
+                      onClick={() => {
+                        const heldText = `Topic: ${lastSentPayload?.topic || formData.topic}\nName: ${lastSentPayload?.name || formData.name}\nEmail: ${lastSentPayload?.email || formData.email}${lastSentPayload?.company ? `\nCompany: ${lastSentPayload.company}` : ''}\nMessage: ${lastSentPayload?.message || formData.message}`;
+                        navigator.clipboard?.writeText(heldText).then(() => {
+                          setCopiedNotice(true);
+                          setTimeout(() => setCopiedNotice(false), 3000);
+                        });
+                      }}
                       className="notice-pill-btn copy-btn"
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -420,15 +489,19 @@ Message: ${formData.message.trim()}`;
                       </svg>
                       <span>{copiedNotice ? 'Copied!' : 'Copy Text'}</span>
                     </button>
-                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setSubmissionState('idle')}
-                    className="notice-edit-link"
-                  >
-                    ← Edit your message
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData({ name: '', email: '', company: '', topic: '', message: '' });
+                        setLastSentPayload(null);
+                        setSubmissionState('idle');
+                      }}
+                      className="notice-pill-btn copy-btn"
+                    >
+                      <span>Send Another Message</span>
+                    </button>
+                  </div>
                 </div>
               ) : (
                 /* ── Clean Pill-Form ── */
@@ -438,6 +511,30 @@ Message: ${formData.message.trim()}`;
                   className="contact-pill-form"
                   aria-label="Send us a message"
                 >
+                  {submissionState === 'error' && (
+                    <div style={{
+                      padding: '12px 16px',
+                      borderRadius: '12px',
+                      backgroundColor: '#fde8e8',
+                      color: '#9b1c1c',
+                      fontSize: '0.9rem',
+                      marginBottom: '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px'
+                    }}>
+                      <span><strong>Notice:</strong> {submissionError}</span>
+                      <a
+                        href={directWhatsAppUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: '#046c4e', fontWeight: 600, textDecoration: 'underline' }}
+                      >
+                        Click here to send directly on WhatsApp instead →
+                      </a>
+                    </div>
+                  )}
+
                   {/* Name (Required) */}
                   <div className="pill-form-group">
                     <label htmlFor="field-name" className="pill-form-label">
@@ -452,6 +549,7 @@ Message: ${formData.message.trim()}`;
                       onChange={(e) => handleChange('name', e.target.value)}
                       onBlur={() => handleBlur('name')}
                       placeholder="Your full name"
+                      disabled={submissionState === 'submitting'}
                       aria-required="true"
                       aria-invalid={touched.name && Boolean(errors.name)}
                       aria-describedby={touched.name && errors.name ? 'err-name' : undefined}
@@ -479,6 +577,7 @@ Message: ${formData.message.trim()}`;
                       onChange={(e) => handleChange('email', e.target.value)}
                       onBlur={() => handleBlur('email')}
                       placeholder="your.email@example.com"
+                      disabled={submissionState === 'submitting'}
                       aria-required="true"
                       aria-invalid={touched.email && Boolean(errors.email)}
                       aria-describedby={touched.email && errors.email ? 'err-email' : undefined}
@@ -507,6 +606,7 @@ Message: ${formData.message.trim()}`;
                       value={formData.company}
                       onChange={(e) => handleChange('company', e.target.value)}
                       placeholder="Company or organization"
+                      disabled={submissionState === 'submitting'}
                       className="pill-input"
                     />
                   </div>
@@ -523,6 +623,7 @@ Message: ${formData.message.trim()}`;
                         value={formData.topic}
                         onChange={(e) => handleChange('topic', e.target.value)}
                         onBlur={() => handleBlur('topic')}
+                        disabled={submissionState === 'submitting'}
                         aria-required="true"
                         aria-invalid={touched.topic && Boolean(errors.topic)}
                         aria-describedby={touched.topic && errors.topic ? 'err-topic' : undefined}
@@ -559,6 +660,7 @@ Message: ${formData.message.trim()}`;
                       onChange={(e) => handleChange('message', e.target.value)}
                       onBlur={() => handleBlur('message')}
                       placeholder="Write your message here..."
+                      disabled={submissionState === 'submitting'}
                       aria-required="true"
                       aria-invalid={touched.message && Boolean(errors.message)}
                       aria-describedby={touched.message && errors.message ? 'err-message' : undefined}
@@ -575,9 +677,11 @@ Message: ${formData.message.trim()}`;
                   <div className="form-submit-row">
                     <button
                       type="submit"
+                      disabled={submissionState === 'submitting'}
                       className="pill-submit-button"
+                      style={{ opacity: submissionState === 'submitting' ? 0.7 : 1, cursor: submissionState === 'submitting' ? 'wait' : 'pointer' }}
                     >
-                      Send Message
+                      {submissionState === 'submitting' ? 'Sending Message...' : 'Send Message'}
                     </button>
                   </div>
                 </form>
