@@ -79,22 +79,25 @@ export default function ContactPage() {
       attributionControl: false
     });
 
-    // Primary tile layer: OpenStreetMap — always reliable, no API key, no CORS issues
-    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      subdomains: ['a', 'b', 'c'],
-      maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    });
-    osmLayer.addTo(map);
+    // Primary tile layer: ESRI ArcGIS World Street Map
+    // ✅ Free, no API key, no domain restrictions, works on localhost AND production
+    const esriLayer = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      {
+        maxZoom: 19,
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012'
+      }
+    );
+    esriLayer.addTo(map);
 
-    // Fallback to CartoCDN light tiles if OSM tiles fail
-    osmLayer.on('tileerror', () => {
-      if (!map._cartoFallbackAdded) {
-        map._cartoFallbackAdded = true;
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-          subdomains: 'abcd',
+    // Fallback 1: OpenStreetMap if ESRI fails
+    esriLayer.on('tileerror', () => {
+      if (!map._osmFallbackAdded) {
+        map._osmFallbackAdded = true;
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          subdomains: ['a', 'b', 'c'],
           maxZoom: 19,
-          attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
       }
     });
