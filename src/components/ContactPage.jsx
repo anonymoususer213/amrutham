@@ -79,23 +79,22 @@ export default function ContactPage() {
       attributionControl: false
     });
 
-    // Primary tile layer: CartoCDN Voyager — works on all public/production domains without API keys
-    const cartoLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd',
+    // Primary tile layer: OpenStreetMap — always reliable, no API key, no CORS issues
+    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      subdomains: ['a', 'b', 'c'],
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
-      crossOrigin: true
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
-    cartoLayer.addTo(map);
+    osmLayer.addTo(map);
 
-    // Fallback to OpenStreetMap if CartoCDN tiles fail
-    cartoLayer.on('tileerror', () => {
-      if (!map._osmFallbackAdded) {
-        map._osmFallbackAdded = true;
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          subdomains: ['a', 'b', 'c'],
+    // Fallback to CartoCDN light tiles if OSM tiles fail
+    osmLayer.on('tileerror', () => {
+      if (!map._cartoFallbackAdded) {
+        map._cartoFallbackAdded = true;
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+          subdomains: 'abcd',
           maxZoom: 19,
-          attribution: '&copy; OpenStreetMap contributors'
+          attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
         }).addTo(map);
       }
     });
@@ -141,17 +140,22 @@ export default function ContactPage() {
     // Ensure map tiles recalculate immediately once container layout renders in production
     const timer1 = setTimeout(() => {
       map.invalidateSize();
-    }, 150);
+    }, 100);
 
     const timer2 = setTimeout(() => {
       map.invalidateSize();
-    }, 500);
+    }, 400);
+
+    const timer3 = setTimeout(() => {
+      map.invalidateSize();
+    }, 1000);
 
     mapInstanceRef.current = map;
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
+      clearTimeout(timer3);
       map.remove();
       mapInstanceRef.current = null;
     };
