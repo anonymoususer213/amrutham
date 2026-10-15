@@ -79,23 +79,23 @@ export default function ContactPage() {
       attributionControl: false
     });
 
-    // High-reliability tile layer compatible with online production hosting (Vercel, Netlify, GitHub Pages, HTTPS)
-    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      subdomains: ['a', 'b', 'c'],
+    // Primary tile layer: CartoCDN Voyager — works on all public/production domains without API keys
+    const cartoLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd',
       maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors',
-      referrerPolicy: 'no-referrer'
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+      crossOrigin: true
     });
-    osmLayer.addTo(map);
+    cartoLayer.addTo(map);
 
-    // Fallback if OpenStreetMap is rate-limited or blocked on public host
-    osmLayer.on('tileerror', () => {
-      if (!map._cartoFallbackAdded) {
-        map._cartoFallbackAdded = true;
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-          subdomains: 'abcd',
+    // Fallback to OpenStreetMap if CartoCDN tiles fail
+    cartoLayer.on('tileerror', () => {
+      if (!map._osmFallbackAdded) {
+        map._osmFallbackAdded = true;
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          subdomains: ['a', 'b', 'c'],
           maxZoom: 19,
-          attribution: '&copy; OpenStreetMap, &copy; CARTO'
+          attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
       }
     });

@@ -10,6 +10,14 @@
   background-color: #FEF7E9;
 }
 
+/* Make logo background invisible on the contact page only.
+   mix-blend-mode: multiply causes the logo's light rectangular
+   backing to blend into the cream page background (#FEF7E9),
+   leaving only the logo artwork visible. */
+.contact-view-container .logo-img {
+  mix-blend-mode: multiply;
+}
+
 /* Full-Screen Vertical Sections */
 .section-hero {
   min-height: 100vh;
