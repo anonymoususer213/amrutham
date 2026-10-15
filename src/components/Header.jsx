@@ -49,7 +49,7 @@ export default function Header({ onNavigate, currentView = 'home' }) {
           }}
         >
           <img 
-            src="/assets/amrutham-logo.png" 
+            src="/assets/amrutham-logo-transparent.png" 
             alt="AMRUTHAM" 
             className="logo-img" 
           />
