@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { PRODUCTS, AMRUTHAM_PHONE_RAW } from '../data/products';
+import { useCart } from '../context/CartContext';
 import './ProductDetail.css';
 
 export default function ProductDetail({ 
@@ -137,6 +138,17 @@ export default function ProductDetail({
     handleSelectImage(nextIdx);
   };
 
+  // Cart integration
+  const { addToCart, addedKeys, openCart } = useCart();
+  const cartItemKey = `${product.id}__${selectedPackIndex}`;
+  const justAdded = !!addedKeys[cartItemKey];
+
+  const handleAddToCart = useCallback(() => {
+    addToCart(product.id, selectedPackIndex);
+    // Update qty in product detail to match what was added
+    // (the cart always starts at 1 or increments, quantity stepper here is for WA only)
+  }, [addToCart, product.id, selectedPackIndex]);
+
   // Quantity Handlers
   const handleDecrement = () => {
     if (quantity > 1) setQuantity((prev) => prev - 1);
@@ -148,7 +160,7 @@ export default function ProductDetail({
 
   // Dynamic WhatsApp Order Message
   const whatsappOrderMessage = useMemo(() => {
-    const msg = `Hi Amrutham, I would like to order: ${product.name} - ${selectedPack.size} - Quantity: ${quantity} (Total: ₹${totalPrice}).`;
+    const msg = `Hi Amrutham, I would like to order: ${product.name} - ${selectedPack.size} - Quantity: ${quantity} (Total: \u20b9${totalPrice}).`;
     return `https://wa.me/${AMRUTHAM_PHONE_RAW}?text=${encodeURIComponent(msg)}`;
   }, [product.name, selectedPack.size, quantity, totalPrice]);
 
@@ -410,6 +422,32 @@ export default function ProductDetail({
                     <span className="btn-text">ORDER ON WHATSAPP</span>
                   </a>
                 </div>
+
+                {/* Add to Cart Button */}
+                <button
+                  type="button"
+                  className={`add-to-cart-btn ${justAdded ? 'is-added' : ''}`}
+                  onClick={handleAddToCart}
+                  aria-label={`Add ${product.name} ${selectedPack.size} to cart`}
+                >
+                  {justAdded ? (
+                    <>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      <span>Added to Cart!</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <path d="M16 10a4 4 0 01-8 0" />
+                      </svg>
+                      <span>ADD TO CART</span>
+                    </>
+                  )}
+                </button>
               </div>
 
               {/* Circular / Rounded Product Benefit Badges (Reference Style) */}

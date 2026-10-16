@@ -647,6 +647,61 @@
   transform: translateY(0);
 }
 
+/* ── Add to Cart Button (sits below WhatsApp row) ─────────────────────────── */
+.add-to-cart-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 28px;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  border: 2px solid #2b1810;
+  color: #2b1810;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(43, 24, 16, 0.06);
+  margin-top: 2px;
+}
+
+.add-to-cart-btn:hover:not(.is-added) {
+  background-color: #2b1810;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(43, 24, 16, 0.2);
+}
+
+.add-to-cart-btn:active {
+  transform: translateY(0);
+}
+
+.add-to-cart-btn:focus-visible {
+  outline: 2px solid #c8521d;
+  outline-offset: 3px;
+}
+
+/* "Added!" flash state */
+.add-to-cart-btn.is-added {
+  background-color: #1e6f42;
+  border-color: #1e6f42;
+  color: #ffffff;
+  transform: none;
+  box-shadow: 0 6px 18px rgba(30, 111, 66, 0.22);
+  cursor: default;
+  animation: cart-btn-flash 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes cart-btn-flash {
+  from { transform: scale(0.96); }
+  to   { transform: scale(1); }
+}
+
 /* ══════════════════════════════════════════
    7. BENEFIT BADGES (Reference Style)
    ══════════════════════════════════════════ */

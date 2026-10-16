@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useCart } from '../context/CartContext';
 import './Header.css';
 
 export default function Header({ onNavigate, currentView = 'home' }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { totalItemCount, toggleCart } = useCart();
 
   const navItems = [
     { label: 'PRODUCTS', href: '#products', action: 'products' },
@@ -31,6 +33,11 @@ export default function Header({ onNavigate, currentView = 'home' }) {
     if (onNavigate && item.action) {
       onNavigate(item.action);
     }
+  };
+
+  const handleCartClick = () => {
+    setIsMobileMenuOpen(false);
+    toggleCart();
   };
 
   return (
@@ -73,20 +80,85 @@ export default function Header({ onNavigate, currentView = 'home' }) {
               {item.label}
             </a>
           ))}
+
+          {/* Cart Icon Button — Desktop */}
+          <button
+            type="button"
+            className="cart-icon-btn"
+            onClick={handleCartClick}
+            aria-label={`Open cart${totalItemCount > 0 ? `, ${totalItemCount} items` : ''}`}
+            aria-controls="cart-panel"
+          >
+            <svg
+              className="cart-icon-svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            {totalItemCount > 0 && (
+              <span className="cart-badge" aria-hidden="true">
+                {totalItemCount > 99 ? '99+' : totalItemCount}
+              </span>
+            )}
+          </button>
         </nav>
 
-        {/* Mobile Hamburger Button */}
-        <button
-          type="button"
-          className={`mobile-menu-toggle ${isMobileMenuOpen ? 'is-open' : ''}`}
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-expanded={isMobileMenuOpen}
-          aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
-        >
-          <span className="hamburger-line line-1"></span>
-          <span className="hamburger-line line-2"></span>
-          <span className="hamburger-line line-3"></span>
-        </button>
+        {/* Mobile Right Controls: Cart Icon + Hamburger */}
+        <div className="mobile-header-right">
+          {/* Cart Icon Button — Mobile */}
+          <button
+            type="button"
+            className="cart-icon-btn mobile-cart-btn"
+            onClick={handleCartClick}
+            aria-label={`Open cart${totalItemCount > 0 ? `, ${totalItemCount} items` : ''}`}
+            aria-controls="cart-panel"
+          >
+            <svg
+              className="cart-icon-svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 01-8 0" />
+            </svg>
+            {totalItemCount > 0 && (
+              <span className="cart-badge" aria-hidden="true">
+                {totalItemCount > 99 ? '99+' : totalItemCount}
+              </span>
+            )}
+          </button>
+
+          {/* Hamburger */}
+          <button
+            type="button"
+            className={`mobile-menu-toggle ${isMobileMenuOpen ? 'is-open' : ''}`}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-expanded={isMobileMenuOpen}
+            aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+          >
+            <span className="hamburger-line line-1"></span>
+            <span className="hamburger-line line-2"></span>
+            <span className="hamburger-line line-3"></span>
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Overlay / Drawer */}
