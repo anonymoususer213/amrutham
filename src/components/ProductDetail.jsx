@@ -144,10 +144,8 @@ export default function ProductDetail({
   const justAdded = !!addedKeys[cartItemKey];
 
   const handleAddToCart = useCallback(() => {
-    addToCart(product.id, selectedPackIndex);
-    // Update qty in product detail to match what was added
-    // (the cart always starts at 1 or increments, quantity stepper here is for WA only)
-  }, [addToCart, product.id, selectedPackIndex]);
+    addToCart(product.id, selectedPackIndex, quantity);
+  }, [addToCart, product.id, selectedPackIndex, quantity]);
 
   // Quantity Handlers
   const handleDecrement = () => {

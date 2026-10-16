@@ -124,11 +124,12 @@ export function CartProvider({ children }) {
   );
 
   // ── Actions ──────────────────────────────────────────────────────────────
-  const addToCart = useCallback((productId, packIndex = 0) => {
+  const addToCart = useCallback((productId, packIndex = 0, quantityToAdd = 1) => {
     const product = PRODUCTS.find((p) => p.id === productId);
     if (!product) return;
     const safePackIndex =
       packIndex >= 0 && packIndex < product.packSizes.length ? packIndex : 0;
+    const qty = Math.max(1, Math.min(50, Number(quantityToAdd) || 1));
     const itemKey = `${productId}__${safePackIndex}`;
 
     setCartItems((prev) => {
@@ -136,14 +137,14 @@ export function CartProvider({ children }) {
         (i) => i.productId === productId && i.packIndex === safePackIndex
       );
       if (existing !== -1) {
-        // Increase quantity (cap at 50)
+        // Increase quantity by qty (cap at 50)
         return prev.map((item, idx) =>
           idx === existing
-            ? { ...item, quantity: Math.min(50, item.quantity + 1) }
+            ? { ...item, quantity: Math.min(50, item.quantity + qty) }
             : item
         );
       }
-      return [...prev, { productId, packIndex: safePackIndex, quantity: 1 }];
+      return [...prev, { productId, packIndex: safePackIndex, quantity: qty }];
     });
 
     // Flash feedback for this item
